@@ -17,9 +17,6 @@ public class Main {
 
   public static final Logger log = LoggerFactory.getLogger(Main.class);
 
-  public static WaitSource bocWaitSource = new BocWaitSource();
-  public static WaitSource rcxWaitSource = new RcxWaitSource();
-
   public static void main(String[] args) throws Exception {
 
     mongoCdc();
@@ -39,13 +36,13 @@ public class Main {
     env.setParallelism(2);
 
     DataStreamSource<String> streamSource = env.addSource(sourceFunction);
-//    new BocTask().execute(streamSource);
+    new BocTask().execute(streamSource);
     new RcxTask().execute(streamSource);
 
-//    DataStreamSource<String> bocDataStream = env.addSource(bocWaitSource);
-//    new BocTask().execute(bocDataStream);
+    DataStreamSource<String> bocDataStream = env.addSource(new BocWaitSource());
+    new BocTask().execute(bocDataStream);
 
-    DataStreamSource rcxDataStream = env.addSource(rcxWaitSource);
+    DataStreamSource rcxDataStream = env.addSource(new RcxWaitSource());
     new RcxTask().execute(rcxDataStream);
 
     env.execute();

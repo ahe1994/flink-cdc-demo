@@ -13,40 +13,43 @@ import org.bson.Document;
  * @Author ahery
  * @Created at 2022/8/6 9:02
  */
-public class Task1 implements Task<String>, MapFunction<String, Document> {
+public class BocTask implements Task<String>, MapFunction<String, Document> {
 
-  public static Map<Integer, Integer> ageMap = new ConcurrentHashMap<>();
+  public static Map<String, Integer> bocMap = new ConcurrentHashMap<>();
+  private final int TARGET_INDEX = 5;
 
   @Override
   public void execute(DataStreamSource source) {
     SingleOutputStreamOperator map = source.map(this);
-    map.addSink(new MongoSink());
+    map.addSink(new BocSink());
   }
 
   @Override
   public Document map(String s) throws Exception {
 
-    Main.log.info("Map source:***************{}" + s);
     JSONObject json = JSONObject.parseObject(s);
     String docStr = json.getString("fullDocument");
     JSONObject doc = JSON.parseObject(docStr);
 
     Integer id = doc.getInteger("id");
+    Integer index = doc.getInteger("index");
     String name = doc.getString("name");
     Integer age = doc.getInteger("age");
 
-    if (id == 5) {
-      ageMap.put(id, age);
+    String targetBocMapKey = id + "-" + TARGET_INDEX;
+    if (index == TARGET_INDEX) {
+      bocMap.put(targetBocMapKey, age);
     }
 
-    Integer targetAge = ageMap.get(5);
+    Integer targetAge = bocMap.get(targetBocMapKey);
     if (targetAge == null) {
-      WaitSource.data.add(s);
+      BocWaitSource.data.add(s);
       return null;
     }
 
     Document document = new Document();
     document.append("id", id);
+    document.append("index", index);
     document.append("name", name);
     document.append("diffAge", age - targetAge);
 
