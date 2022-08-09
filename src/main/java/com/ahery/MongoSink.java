@@ -1,5 +1,7 @@
 package com.ahery;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -33,6 +35,14 @@ public class MongoSink extends RichSinkFunction<Document> {
         mongoClient = MongoUtil.getConnect();
         MongoDatabase db = mongoClient.getDatabase(dbName);
         MongoCollection collection = db.getCollection(collectionName);
+
+        BasicDBObject query = new BasicDBObject();
+        query.put("index", value.getInteger("index"));
+        FindIterable findIterable = collection.find(query);
+        if (findIterable.cursor().hasNext()) {
+          return;
+        }
+
         collection.insertOne(value);
       }
     } catch (Exception e) {

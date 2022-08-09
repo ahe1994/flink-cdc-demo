@@ -7,6 +7,6 @@ package com.ahery;
 public class RcxSink extends MongoSink {
 
   public RcxSink() {
-    super("test", "user-rcx");
+    super(Conf.instance().getSinkDatabase(), "user-rcx");
   }
 }

@@ -10,7 +10,13 @@ import com.mongodb.client.MongoClients;
 public class MongoUtil {
 
   public static MongoClient getConnect() {
-    String uri = "mongodb://root:123456@81.69.24.2:27017/?maxPoolSize=20&w=majority";
+    Conf conf = Conf.instance();
+//    String uri = "mongodb://root:123456@81.69.24.2:27017/?maxPoolSize=20&w=majority";
+    String uri = String.format("mongodb://%s:%s@%s:%d/?maxPoolSize=20&w=majority",
+        conf.getSinkUser(),
+        conf.getSinkPassword(),
+        conf.getSinkHost(),
+        conf.getSinkPort());
     try {
       return MongoClients.create(uri);
     } catch (Exception e) {

@@ -7,6 +7,6 @@ package com.ahery;
 public class BocSink extends MongoSink {
 
   public BocSink() {
-    super("test", "user-boc");
+    super(Conf.instance().getSinkDatabase(), "user-boc");
   }
 }
